@@ -28,9 +28,7 @@ int main(int argc, char* argv[])
 		glfwTerminate();
 		return -1;
 	}
-	GLuint myVBO;
-	glGenBuffers(1, &myVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, myVBO);
+
 	
 	GLfloat bufferData[] = {
 		0.0, 0.0,
@@ -38,26 +36,53 @@ int main(int argc, char* argv[])
 		0.5,-0.5
 	};
 
-	glBufferData(GL_ARRAY_BUFFER, 48, bufferData, GL_STATIC_DRAW);
+	GLfloat colors[] = {
+		1.0, 0.0, 0.0,
+		0.0, 1.0, 0.0,
+		0.0, 0.0, 1.0
+	};
 
 	GLint vShader = ShaderUtils::CreateShaderFromFile("D:/OpenGLFall2014/myglfwapp1/src/glsl/vert.glsl", GL_VERTEX_SHADER);
 	GLint fShader = ShaderUtils::CreateShaderFromFile("D:/OpenGLFall2014/myglfwapp1/src/glsl/frag.glsl", GL_FRAGMENT_SHADER);
 	GLuint shaderProgram = ShaderUtils::CreateProgramFromShaders(vShader, fShader);
-	glDeleteShader(vShader);
-	glDeleteShader(fShader);
+	glUseProgram(shaderProgram);
+	GLint positionAttr = glGetAttribLocation(shaderProgram, "position");
+	GLint colorAttr = glGetAttribLocation(shaderProgram, "color");
+
+
+	GLuint myVBO;
+	glGenBuffers(1, &myVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, myVBO);
+	glBufferData(GL_ARRAY_BUFFER, 48, bufferData, GL_STATIC_DRAW);
+
+	//GLuint myVAO;
+	//glGenVertexArrays(1, &myVAO);
+	//glBindVertexArray(myVAO);
+	glEnableVertexAttribArray(positionAttr);
+	glVertexAttribPointer(positionAttr, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+	GLuint colBuf;
+	glGenBuffers(1, &colBuf);
+	glBindBuffer(GL_ARRAY_BUFFER, colBuf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(colorAttr);
+	glVertexAttribPointer(colorAttr, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	while(!glfwWindowShouldClose(window)){
 		GLint windowWidth, windowHeight;
 		glfwGetWindowSize(window, &windowWidth, &windowHeight);
 		glViewport(0, 0, windowWidth, windowHeight);
 		
-		glClearColor(1.0, 1.0, 0.0, 1.0);
+		glClearColor(0.0, 0.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
-		
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}
 
+	glDeleteShader(vShader);
+	glDeleteShader(fShader);
+	glDeleteProgram(shaderProgram);
 	glfwDestroyWindow(window);
 	glfwTerminate();
 	return 0;

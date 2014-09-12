@@ -81,11 +81,13 @@
   <ItemGroup>
     <ClCompile Include="..\src\Main.cpp" />
     <ClCompile Include="..\src\ShaderUtils.cpp" />
-    <ClCompile Include="..\src\ShaderUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\glsl\frag.glsl" />
     <None Include="..\src\glsl\vert.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\ShaderUtils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
