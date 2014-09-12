@@ -80,6 +80,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Main.cpp" />
+    <ClCompile Include="..\src\ShaderUtils.cpp" />
+    <ClCompile Include="..\src\ShaderUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\glsl\frag.glsl" />

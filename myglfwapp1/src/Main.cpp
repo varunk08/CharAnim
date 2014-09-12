@@ -1,6 +1,7 @@
 #include <GL/glew.h>
 #include <iostream>
 #include <GLFW\glfw3.h>
+#include "ShaderUtils.h"
 
 int main(int argc, char* argv[])
 {
@@ -30,13 +31,20 @@ int main(int argc, char* argv[])
 	GLuint myVBO;
 	glGenBuffers(1, &myVBO);
 	glBindBuffer(GL_ARRAY_BUFFER, myVBO);
+	
 	GLfloat bufferData[] = {
-		0.0, 0.5,
+		0.0, 0.0,
 		-0.5,-0.5,
 		0.5,-0.5
 	};
+
 	glBufferData(GL_ARRAY_BUFFER, 48, bufferData, GL_STATIC_DRAW);
 
+	GLint vShader = ShaderUtils::CreateShaderFromFile("D:/OpenGLFall2014/myglfwapp1/src/glsl/vert.glsl", GL_VERTEX_SHADER);
+	GLint fShader = ShaderUtils::CreateShaderFromFile("D:/OpenGLFall2014/myglfwapp1/src/glsl/frag.glsl", GL_FRAGMENT_SHADER);
+	GLuint shaderProgram = ShaderUtils::CreateProgramFromShaders(vShader, fShader);
+	glDeleteShader(vShader);
+	glDeleteShader(fShader);
 
 	while(!glfwWindowShouldClose(window)){
 		GLint windowWidth, windowHeight;
@@ -45,7 +53,7 @@ int main(int argc, char* argv[])
 		
 		glClearColor(1.0, 1.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
-
+		
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}
