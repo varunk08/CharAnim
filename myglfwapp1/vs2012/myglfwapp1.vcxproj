@@ -58,7 +58,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glew32d.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);glfw3.lib;opengl32.lib</AdditionalDependencies>
+      <AdditionalDependencies>ILU.lib;DevIL.lib;glew32d.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);glfw3.lib;opengl32.lib</AdditionalDependencies>
+      <LinkStatus>true</LinkStatus>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -81,6 +82,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\Main.cpp" />
     <ClCompile Include="..\src\ShaderUtils.cpp" />
+    <ClCompile Include="..\src\TextureUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\glsl\frag.glsl" />
@@ -88,6 +90,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ShaderUtils.h" />
+    <ClInclude Include="..\src\TextureUtils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
