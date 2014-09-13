@@ -1,15 +1,15 @@
 #include "TextureUtils.h"
 
-GLuint TextureUtils::CreateTexture(const ILchar* path)
+GLuint TextureUtils::CreateTexture(std::string path)
 {
 	
 	ILuint image = ilGenImage();
 	ilBindImage(image);
-	ILboolean loadSuccess = ilLoadImage(path);
+	ILboolean loadSuccess = ilLoadImage((ILstring) path.c_str());
 	std::cout << loadSuccess << std::endl;
 	if ( !loadSuccess )
 	{
-		std::wcout << L"Failed to load image! " << path << std::endl;
+		std::cout << "Failed to load image! " << path << std::endl;
 		
 		ilBindImage(NULL);
 		ilDeleteImage(image);
@@ -21,7 +21,7 @@ GLuint TextureUtils::CreateTexture(const ILchar* path)
 	ILboolean convertSuccess = ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
 	if (!convertSuccess)
 	{
-		std::wcout << L"Failed to convert image! " << path << std::endl;
+		std::cout << "Failed to convert image! " << path << std::endl;
 		ilBindImage(NULL);
 		ilDeleteImage(image);
 		return NULL;
@@ -32,6 +32,9 @@ GLuint TextureUtils::CreateTexture(const ILchar* path)
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
 
 	glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_FORMAT),
 		ilGetInteger(IL_IMAGE_WIDTH),

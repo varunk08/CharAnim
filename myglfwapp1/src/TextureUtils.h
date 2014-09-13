@@ -5,9 +5,10 @@
 #include <GLFW\glfw3.h>
 #include <IL\il.h>
 #include <IL\ilu.h>
+#include <string>
 class TextureUtils
 {
 public:
-	static GLuint CreateTexture(const ILchar* path);
+	static GLuint CreateTexture(std::string path);
 };
 #endif

@@ -32,10 +32,10 @@ int main(int argc, char* argv[])
 
 	
 	GLfloat bufferData[] = {
-		-0.5, 0.5, 0, 1,
+		-0.5, 0.5, 0, 2,
 		-0.5,-0.5, 0, 0,
-		0.5,-0.5, 1, 0,
-		0.5,0.5, 1, 1
+		0.5,-0.5, 2, 0,
+		0.5,0.5, 2, 2
 	};
 
 	GLfloat colors[] = {
@@ -87,9 +87,10 @@ int main(int argc, char* argv[])
 	glVertexAttribPointer(positionAttr, 2, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat), (GLvoid*) (0*sizeof(GLfloat)));
 	glVertexAttribPointer(texcoordAttr, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
 	ilInit();
-	iluInit();
+	ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
+	ilEnable(IL_ORIGIN_SET);
 	
-	const ILchar* file = L"profile.png";
+	std::string file = "D:/OpenGLFall2014/myglfwapp1/src/textures/bryan.jpg";
 
 	GLuint texture = TextureUtils::CreateTexture(file);
 	glActiveTexture(GL_TEXTURE0);
