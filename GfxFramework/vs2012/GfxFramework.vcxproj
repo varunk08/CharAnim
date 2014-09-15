@@ -12,6 +12,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Main.cpp" />
+    <ClCompile Include="..\src\Node.h" />
+    <ClCompile Include="..\src\ShaderUtils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\Plane.h" />
+    <ClInclude Include="..\src\ShaderUtils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\shaders\simple.frag" />
+    <None Include="..\src\shaders\simple.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5D64A497-7AE7-4336-8126-50EB02E144C9}</ProjectGuid>
@@ -63,7 +73,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Opengl32.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glew32d.lib;Opengl32.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
