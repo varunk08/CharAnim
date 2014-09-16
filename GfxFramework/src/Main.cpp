@@ -15,14 +15,19 @@ using namespace Eigen;
 using namespace std;
 
 double mCursorX, mCursorY;
-
+Camera *cam;
+void MouseScrollCallback(GLFWwindow* window, double xoff, double yoff)
+{
+	cam->UpdateViewDistance((float)yoff);
+}
 void MouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
 {
-	double dx = mCursorX - xpos;
+	double dx = xpos - mCursorX ;
 	double dy = mCursorY - ypos;
 	mCursorX = xpos;
 	mCursorY = ypos;
-	cout << "dx: " << dx << " dy: " << dy << endl;
+	cam->UpdateCamRotation((float)dx, (float)dy);
+	
 }
 void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
@@ -61,7 +66,8 @@ int main(int argc, char* argv[])
 		 return -1;
 	 }
 	 glfwSetMouseButtonCallback(window, MouseButtonCallback);
-	 Camera *cam = new Camera(glm::vec3(2.0, 0.0f, 2.0f),glm::vec3(0.0f,0.0f,0.0f));
+	 glfwSetScrollCallback(window, MouseScrollCallback);
+	 cam = new Camera(glm::vec3(2.0, 0.0f, 2.0f),glm::vec3(0.0f,0.0f,0.0f));
 	 cam->SetPerspectiveProjection(45.0f, 4.0f/3.0f, 0.1f, 100.0f);
 	
 	//Shaders

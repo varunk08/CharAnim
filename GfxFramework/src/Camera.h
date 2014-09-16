@@ -7,6 +7,8 @@
 #include <math.h>
 #include <glm/glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 #define _USE_MATH_DEFINES
 class Camera
 {
@@ -26,8 +28,8 @@ public:
 	glm::vec3 GetPosition();
 	void SetPerspectiveProjection(float fovydeg, float aspect, float near, float far);
 	glm::mat4 GetProjectionMatrix();
-	void UpdateCamTheta(double dTheta);
-	void UpdateCamPhi(double dPhi);
+	void UpdateCamRotation(float dTheta, float dPhi);
+	void UpdateViewDistance(float dDist);
 	void SetViewTransform();
 	glm::mat4 GetViewTransform();
 	~Camera();
@@ -35,9 +37,8 @@ public:
 private:
 	glm::mat4 mProjectionTransformation;
 	glm::mat4 mViewTransform;
-	double theta;
-	double phi;
 	glm::vec3 viewVec;
+	glm::vec3 camX;
 };
 Camera::Camera()
 {
@@ -47,19 +48,21 @@ Camera::Camera(glm::vec3 pos, glm::vec3 COI)
 	this->mWorldPosition = pos;
 	this->mCOI = COI;
 	//calculate up vector
-	viewVec = mCOI - mWorldPosition;
-	glm::vec3 camX = glm::cross(viewVec, glm::vec3(0.0f, 1.0f, 0.0f));
-	this->mUp = glm::cross(viewVec, camX);
-	glm::normalize(this->mUp);
+	viewVec = mWorldPosition - mCOI;
 	SetViewTransform();
 
-	//calculate theta and phi based on position
-	//create coordinate system at COI using lookat()
+	
+	//create coordinate system at COI using lookat() - NO
+	//can rotate around origin and then translate by COI + viewVec
 
 }
 void Camera::SetViewTransform()
 {
-	mViewTransform = glm::lookAt(mWorldPosition, mCOI, mUp);
+	camX = glm::cross(viewVec, glm::vec3(0.0f, 1.0f, 0.0f));
+	this->mUp = glm::cross(viewVec, camX);
+	glm::normalize(this->mUp);
+	this->mViewTransform = glm::lookAt(mWorldPosition, mCOI, mUp);
+	//std::cout <<" View: "<< glm::to_string(mViewTransform)<<std::endl;
 }
 glm::mat4 Camera::GetViewTransform()
 {
@@ -73,13 +76,26 @@ glm::mat4 Camera::GetProjectionMatrix()
 {
 	return this->mProjectionTransformation;
 }
-void Camera::UpdateCamTheta(double dTheta)
+void Camera::UpdateCamRotation(float dTheta, float dPhi)
 {
-	//glm::rotate(mModelTransformation, )
+	viewVec = glm::rotate(viewVec, dTheta, glm::vec3(0.0f, 1.0f, 0.0f) ); //change to cam up/ right
+	viewVec = glm::rotate(viewVec,dPhi, camX );
+	//std::cout << "rot: "<< glm::to_string(viewVec)<<std::endl;
+	mWorldPosition = mCOI + viewVec;
+	SetViewTransform();
 }
-void Camera::UpdateCamPhi(double dPhi)
+void Camera::UpdateViewDistance(float dDist)
 {
-
+	if(dDist > 0  && viewVec.length() < 100.0f)
+	{
+			viewVec = 1.2f * viewVec;
+	}
+	else if( dDist < 0 && viewVec.length() >0.5f )
+	{
+		viewVec = 0.8f * viewVec;
+	}
+	mWorldPosition = mCOI + viewVec;
+	SetViewTransform();
 }
 
 Camera::~Camera()
