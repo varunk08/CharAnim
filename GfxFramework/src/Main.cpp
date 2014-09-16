@@ -14,6 +14,28 @@
 using namespace Eigen;
 using namespace std;
 
+double mCursorX, mCursorY;
+
+void MouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
+{
+	double dx = mCursorX - xpos;
+	double dy = mCursorY - ypos;
+	mCursorX = xpos;
+	mCursorY = ypos;
+	cout << "dx: " << dx << " dy: " << dy << endl;
+}
+void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+	if (action == GLFW_PRESS)
+	{
+		glfwGetCursorPos(window, &mCursorX, &mCursorY);
+		glfwSetCursorPosCallback(window, MouseMoveCallback);
+	}
+	else if (action == GLFW_RELEASE)
+	{
+		glfwSetCursorPosCallback(window, NULL);
+	}
+}
 int main(int argc, char* argv[])
 {
 	
@@ -38,7 +60,8 @@ int main(int argc, char* argv[])
 		 std::cout << "Glew init failed: " << glewGetErrorString(err) << std::endl;
 		 return -1;
 	 }
-	 Camera *cam = new Camera();
+	 glfwSetMouseButtonCallback(window, MouseButtonCallback);
+	 Camera *cam = new Camera(glm::vec3(2.0, 0.0f, 2.0f),glm::vec3(0.0f,0.0f,0.0f));
 	 cam->SetPerspectiveProjection(45.0f, 4.0f/3.0f, 0.1f, 100.0f);
 	
 	//Shaders
@@ -47,10 +70,11 @@ int main(int argc, char* argv[])
 	GLuint shaderProg = ShaderUtils::CreateProgramFromShaders(vs,fs);
 	GLint projAttr = glGetUniformLocation(shaderProg, "projection");
 	GLint modelAttr = glGetUniformLocation(shaderProg, "model");
+	GLint viewAttr = glGetUniformLocation(shaderProg, "view");
 
 	//Objects
 	Plane *plane = new Plane(glm::vec3(0.0,0.0,0.0));
-	Cube *cube = new Cube(Vector3f(0.0f,0.0f,-2.0f));
+	Cube *cube = new Cube(Vector3f(0.0f,0.0f, 0.0f));
 	cube->SetShader(shaderProg);
 	plane->SetShader(shaderProg);
 	
@@ -61,12 +85,11 @@ int main(int argc, char* argv[])
 	
 	//Transforms
 	plane->SetModelTransform(
-		glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,-1.0f,-5.0f))
-		* glm::rotate(glm::mat4(1.0f),-90.0f,glm::vec3(1.0f,0.0f,0.0f))
+		//glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,-0.5f,-5.0f)) *
+		 glm::rotate(glm::mat4(1.0f),-90.0f,glm::vec3(1.0f,0.0f,0.0f))
 		 * glm::scale(glm::mat4(1.0f),glm::vec3(5.0f))
 	);
-	glm::mat4 rot = glm::mat4(1.0f);
-	
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
@@ -74,15 +97,12 @@ int main(int argc, char* argv[])
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(shaderProg);
 		glUniformMatrix4fv(projAttr,1,GL_FALSE,glm::value_ptr(cam->GetProjectionMatrix()));
-		
+		glUniformMatrix4fv(viewAttr, 1, GL_FALSE, glm::value_ptr(cam->GetViewTransform()));
 		//Plane
 		glUniformMatrix4fv(modelAttr,1,GL_FALSE,glm::value_ptr(plane->GetModelTransform()));
 		plane->Render();
+		
 		//Cube
-
-		rot = glm::rotate(rot, 0.01f,glm::vec3(0.0,1.0,0.0));
-		Matrix4f model(glm::value_ptr(rot));
-		cube->mModelTransform = cube->mModelTransform * model;
 		glUniformMatrix4fv(modelAttr,1, GL_FALSE, (const GLfloat*)cube->GetModelTransform().data());
 		cube->Render();
 

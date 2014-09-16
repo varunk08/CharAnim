@@ -56,7 +56,7 @@ void Cube::SetShader(GLuint shaderID)
 void Cube::SetModelTransform()
 {
 	mModelTransform.setIdentity();
-	mModelTransform.translate(Vector3f(0.0f,0.0f,-5.0f));
+	mModelTransform.translate(Vector3f(0.0f,0.0f,0.0f));
 	std::cout<<mModelTransform.matrix()<< std::endl;
 }
 Affine3f Cube::GetModelTransform()
