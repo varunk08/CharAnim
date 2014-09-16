@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
 	 }
 	 glfwSetMouseButtonCallback(window, MouseButtonCallback);
 	 glfwSetScrollCallback(window, MouseScrollCallback);
-	 cam = new Camera(glm::vec3(2.0, 0.0f, 2.0f),glm::vec3(0.0f,0.0f,0.0f));
+	 cam = new Camera(glm::vec3(2.0, 2.0f, 2.0f),glm::vec3(0.0f,0.0f,0.0f));
 	 cam->SetPerspectiveProjection(45.0f, 4.0f/3.0f, 0.1f, 100.0f);
 	
 	//Shaders

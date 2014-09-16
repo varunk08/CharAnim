@@ -51,18 +51,13 @@ Camera::Camera(glm::vec3 pos, glm::vec3 COI)
 	viewVec = mWorldPosition - mCOI;
 	SetViewTransform();
 
-	
-	//create coordinate system at COI using lookat() - NO
-	//can rotate around origin and then translate by COI + viewVec
-
 }
 void Camera::SetViewTransform()
 {
-	camX = glm::cross(viewVec, glm::vec3(0.0f, 1.0f, 0.0f));
+	camX = glm::cross( glm::vec3(0.0f, 1.0f, 0.0f), viewVec);
 	this->mUp = glm::cross(viewVec, camX);
 	glm::normalize(this->mUp);
 	this->mViewTransform = glm::lookAt(mWorldPosition, mCOI, mUp);
-	//std::cout <<" View: "<< glm::to_string(mViewTransform)<<std::endl;
 }
 glm::mat4 Camera::GetViewTransform()
 {
