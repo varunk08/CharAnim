@@ -5,7 +5,7 @@
 #include <Eigen\Dense>
 #include <GL/glew.h>
 #include <GLFW\glfw3.h>
-
+#include <glm\glm.hpp>
 //#include "Node.h"
 
 using namespace Eigen;
@@ -15,15 +15,16 @@ class Plane
 {
 public:
 	//Properties
-	Vector3f mPosition;
+	glm::vec3 mPosition;
 	GLuint mVertexBuf;
 	GLuint mVAO;
-	Plane(Vector3f pos);
+	Plane(glm::vec3 pos);
 	void SetGeometry();
 	void InitBuffers();
 	void Render();
 	void SetShader(GLuint shaderID);
-	void SetModelTransform();
+	void SetModelTransform(glm::mat4 transform);
+	glm::mat4 GetModelTransform();
 	~Plane();
 
 private:
@@ -31,9 +32,10 @@ private:
 	GLuint mPositionAttr;
 	GLuint mColorAttr;
 	GLuint mTexCoordAttr;
+	glm::mat4 mModelTransform;
 };
 
-Plane::Plane(Vector3f pos)
+Plane::Plane(glm::vec3 pos)
 {
 	this->mPosition = pos;
 	
@@ -44,6 +46,14 @@ void Plane::SetShader(GLuint shaderID)
 	mPositionAttr = glGetAttribLocation(shaderID, "position");
 	this->InitBuffers();
 	glUseProgram(0);
+}
+void Plane::SetModelTransform(glm::mat4 transform)
+{
+	mModelTransform = transform;
+}
+glm::mat4 Plane::GetModelTransform()
+{
+	return this->mModelTransform;
 }
 void Plane::InitBuffers()
 {
