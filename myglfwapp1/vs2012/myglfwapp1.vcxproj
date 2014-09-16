@@ -89,6 +89,9 @@
     <None Include="..\src\glsl\vert.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Camera.h" />
+    <ClInclude Include="..\src\Node.h" />
+    <ClInclude Include="..\src\Plane.h" />
     <ClInclude Include="..\src\ShaderUtils.h" />
     <ClInclude Include="..\src\TextureUtils.h" />
   </ItemGroup>
