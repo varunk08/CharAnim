@@ -16,6 +16,8 @@
     <ClCompile Include="..\src\ShaderUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Camera.h" />
+    <ClInclude Include="..\src\Cube.h" />
     <ClInclude Include="..\src\Plane.h" />
     <ClInclude Include="..\src\ShaderUtils.h" />
   </ItemGroup>
