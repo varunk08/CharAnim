@@ -4,7 +4,7 @@
 #include <Eigen\Dense>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
+#include <list>
 #include "Node.h"
 #include "Plane.h"
 #include "ShaderUtils.h"
@@ -100,11 +100,16 @@ int main(int argc, char* argv[])
 		 glm::rotate(glm::mat4(1.0f),-90.0f,glm::vec3(1.0f,0.0f,0.0f))
 		 * glm::scale(glm::mat4(1.0f),glm::vec3(5.0f))
 	);
-	node->SetModelTransform(
+/*	node->ChainModelTransform(
 		glm::translate(glm::mat4(1.0f),glm::vec3(1.0f,0.0f,0.0f))
 		* glm::rotate(glm::mat4(1.0f), 40.0f, glm::vec3(0.0f, 0.0f, 1.0f))
-		);
-
+		);*/
+	std::list<glm::mat4> rotlist;
+	glm::mat4 rot30(1.0f);
+	rot30 = glm::rotate(rot30,30.0f,glm::vec3(0.0,0.0,1.0f));
+	rotlist.push_back(rot30);
+	rotlist.push_back(rot30);
+	node->SetRotation(rotlist);
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
