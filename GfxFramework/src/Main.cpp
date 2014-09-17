@@ -4,6 +4,8 @@
 #include <Eigen\Dense>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include "Node.h"
 #include "Plane.h"
 #include "ShaderUtils.h"
 #include "Cube.h"
@@ -22,7 +24,7 @@ void MouseScrollCallback(GLFWwindow* window, double xoff, double yoff)
 }
 void MouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
 {
-	double dx = xpos - mCursorX ;
+	double dx = mCursorX - xpos;
 	double dy = mCursorY - ypos;
 	mCursorX = xpos;
 	mCursorY = ypos;
@@ -80,7 +82,10 @@ int main(int argc, char* argv[])
 
 	//Objects
 	Plane *plane = new Plane(glm::vec3(0.0,0.0,0.0));
-	Cube *cube = new Cube(Vector3f(0.0f,0.0f, 0.0f));
+	Cube *cube = new Cube(glm::vec3(0.0f,0.0f, 0.0f));
+	Node *node = new Node(glm::vec3(1.0f,0.0f,-1.0f));
+	node->CreateNewChildNode();
+	node->SetShader(shaderProg);
 	cube->SetShader(shaderProg);
 	plane->SetShader(shaderProg);
 	
@@ -95,6 +100,10 @@ int main(int argc, char* argv[])
 		 glm::rotate(glm::mat4(1.0f),-90.0f,glm::vec3(1.0f,0.0f,0.0f))
 		 * glm::scale(glm::mat4(1.0f),glm::vec3(5.0f))
 	);
+	node->SetModelTransform(
+		glm::translate(glm::mat4(1.0f),glm::vec3(1.0f,0.0f,0.0f))
+		* glm::rotate(glm::mat4(1.0f), 40.0f, glm::vec3(0.0f, 0.0f, 1.0f))
+		);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -109,10 +118,10 @@ int main(int argc, char* argv[])
 		plane->Render();
 		
 		//Cube
-		glUniformMatrix4fv(modelAttr,1, GL_FALSE, (const GLfloat*)cube->GetModelTransform().data());
-		cube->Render();
+		//glUniformMatrix4fv(modelAttr,1, GL_FALSE, glm::value_ptr(cube->GetModelTransform()));
+		//cube->Render();
 
-
+		node->Render();
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 

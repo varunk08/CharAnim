@@ -6,7 +6,6 @@
 #include <GL/glew.h>
 #include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
-//#include "Node.h"
 
 using namespace Eigen;
 
@@ -29,6 +28,7 @@ public:
 
 private:
 	GLuint mIndexBuf;
+	GLuint mColBuf;
 	GLuint mPositionAttr;
 	GLuint mColorAttr;
 	GLuint mTexCoordAttr;
@@ -44,6 +44,7 @@ void Plane::SetShader(GLuint shaderID)
 {
 	glUseProgram(shaderID);
 	mPositionAttr = glGetAttribLocation(shaderID, "position");
+	mColorAttr = glGetAttribLocation(shaderID, "color");
 	this->InitBuffers();
 	glUseProgram(0);
 }
@@ -61,18 +62,19 @@ void Plane::InitBuffers()
 	glBindVertexArray(mVAO);
 	glGenBuffers(1, &mVertexBuf);
 	glGenBuffers(1, &mIndexBuf);
-/*	GLfloat vertexData[] = {
-		-1.0f, 0.0f, 1.0f,
-		 1.0f, 0.0f, 1.0f,
-		 1.0f, 0.0f, -1.0f,
-		-1.0f, 0.0f, -1.0f
-	};
-*/
+	glGenBuffers(1, &mColBuf);
+
 	GLfloat vertexData[] = {
 		-0.5f, -0.5f, 0.0f,
 		 0.5f, -0.5f, 0.0f,
 		 0.5f, 0.5f, 0.0f,
 		-0.5f, 0.5f, 0.0f
+	};
+	GLfloat colorData[]= {
+		0.5f, 0.5f, 0.8f,
+		0.5f, 0.5f, 0.8f,
+		0.5f, 0.5f, 0.8f,
+		0.5f, 0.5f, 0.8f
 	};
 	GLuint indexData[] = { 
 		0,1,2,
@@ -84,6 +86,10 @@ void Plane::InitBuffers()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(indexData),indexData,GL_STATIC_DRAW);
 	glEnableVertexAttribArray(mPositionAttr);
 	glVertexAttribPointer(mPositionAttr, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, mColBuf);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(colorData),colorData,GL_STATIC_DRAW);
+	glEnableVertexAttribArray(mColorAttr);
+	glVertexAttribPointer(mColorAttr, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, NULL);
 }
