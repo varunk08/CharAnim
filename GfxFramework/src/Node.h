@@ -16,11 +16,14 @@ class Node
 {
 public:
 	//Properties
-	glm::vec3 mPosition; //doing nothing with position now. using model transform directly
+	glm::vec3 mPosition; //position in object coordinates. position is same as joint position
+	float mWAngle;
+	float mLength;
 	Node* mChild;	
 	glm::mat4 mModelTransform;
 	Cube *mDrawable; //Drawable
     bool mTranslate;
+	glm::mat4 mRotationMat; //model space rotation matrix
 	//Methods
 	Node(glm::vec3 pos);
 	void SetShader(GLint shaderID);
@@ -32,6 +35,10 @@ public:
 	void SetRotation(std::list<glm::mat4> rotList); //must clear self transform and set new transform
 	float* GetChildAngles();
 	void SetTranslate(bool isChild);
+	glm::vec3 GetWorldPosition();
+	void SetAngle(float angle);
+	float GetAngle();
+	
 	~Node();
 
 private:

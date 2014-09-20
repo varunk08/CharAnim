@@ -19,6 +19,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\Camera.h" />
     <ClInclude Include="..\src\Cube.h" />
+    <ClInclude Include="..\src\IKSolver.h" />
     <ClInclude Include="..\src\Node.h" />
     <ClInclude Include="..\src\Plane.h" />
     <ClInclude Include="..\src\ShaderUtils.h" />

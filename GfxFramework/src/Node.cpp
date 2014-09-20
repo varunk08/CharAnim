@@ -1,7 +1,6 @@
 #include "Node.h"
 /***
-position is dummy now.
-doing everything with model transform.
+Position is in object or model coordinates
 ***/
 Node::Node(glm::vec3 position)
 {
@@ -9,12 +8,15 @@ Node::Node(glm::vec3 position)
 	mDrawable = new Cube(position);
 	mChild = nullptr;
 	mModelTransform = glm::mat4(1.0f);
+	mRotationMat = glm::mat4(1.0f);
 	mTranslate = false;
+	this->mLength = glm::length(NODE_LENGTH);
 }
 void Node::CreateNewChildNode()
 {
 	//create a new node
 	Node* child = new Node(glm::vec3(0.0f, 0.0f, 0.0f));
+	child->SetAngle(0.0f);
 	child->SetTranslate(true);
 	//translate it to be at top end of parent node and then multiply with parent's model transform
 	child->ChainModelTransform(
@@ -40,13 +42,10 @@ void Node::SetShader(GLint shaderID)
 		mChild->SetShader(shaderID);
 	}
 }
-void Node::UpdateChildTransform(glm::mat4 newRotation)
-{
-	
-}
 
 void Node::ChainModelTransform(glm::mat4 transform)
 {
+	this->mPosition = glm::vec3(transform * glm::vec4(this->mPosition, 1.0f));
 	this->mModelTransform = transform;
 	this->mDrawable->SetModelTransform(transform);
 	if(mChild)
@@ -73,7 +72,7 @@ void Node::SetRotation(std::list<glm::mat4> rotList)
 		newRotTrans = rotList.back();
 		rotList.pop_back();
 	}
-
+	this->mRotationMat = newRotTrans;
 	// construct new model transformation
 	glm::mat4 newModelTransform;
 	if(mTranslate)
@@ -90,6 +89,18 @@ void Node::SetRotation(std::list<glm::mat4> rotList)
 
 	ChainModelTransform(mModelTransform); // transform all children hierarchically
 
+}
+glm::vec3 Node::GetWorldPosition()
+{
+	return glm::vec3(this->mModelTransform * glm::vec4(this->mPosition, 1.0f));
+}
+void Node::SetAngle(float angle)
+{
+	this->mWAngle = angle;
+}
+float Node::GetAngle()
+{
+	return this->mWAngle;
 }
 Node::~Node()
 {

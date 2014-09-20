@@ -10,7 +10,9 @@
 #include "ShaderUtils.h"
 #include "Cube.h"
 #include "Camera.h"
+#include "IKSolver.h"
 
+#define NUM_LINKS 2
 #define EIGEN_DONT_ALIGN_STATICALLY 1
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT 1
 using namespace Eigen;
@@ -69,7 +71,7 @@ int main(int argc, char* argv[])
 	 }
 	 glfwSetMouseButtonCallback(window, MouseButtonCallback);
 	 glfwSetScrollCallback(window, MouseScrollCallback);
-	 cam = new Camera(glm::vec3(2.0, 2.0f, 2.0f),glm::vec3(0.0f,0.0f,0.0f));
+	 cam = new Camera(glm::vec3(0.0, 1.0f, 2.0f),glm::vec3(0.0f,0.0f,0.0f));
 	 cam->SetPerspectiveProjection(45.0f, 4.0f/3.0f, 0.1f, 100.0f);
 	
 	//Shaders
@@ -83,13 +85,15 @@ int main(int argc, char* argv[])
 	//Objects
 	Plane *plane = new Plane(glm::vec3(0.0,0.0,0.0));
 	Cube *cube = new Cube(glm::vec3(0.0f,0.0f, 0.0f));
-	Node *node = new Node(glm::vec3(1.0f,0.0f,-1.0f));
+	Node *node = new Node(glm::vec3(0.0f,0.0f,0.0f));
 	node->CreateNewChildNode();
+	node->SetAngle(0.0f);
 	node->SetShader(shaderProg);
 	cube->SetShader(shaderProg);
 	plane->SetShader(shaderProg);
 	
-
+	IKSolver* iksolve = new IKSolver(node, NUM_LINKS);
+	iksolve->SetTargetPosition(Vector3f(1,1,1));
 	//GL state
 	glClearColor(0.5f,0.5f,0.5f,1.0f);
 	glEnable(GL_DEPTH_TEST);
@@ -106,10 +110,10 @@ int main(int argc, char* argv[])
 		);*/
 	std::list<glm::mat4> rotlist;
 	glm::mat4 rot30(1.0f);
-	rot30 = glm::rotate(rot30,30.0f,glm::vec3(0.0,0.0,1.0f));
+	rot30 = glm::rotate(rot30,-30.0f,glm::vec3(0.0,0.0,1.0f));
 	rotlist.push_back(rot30);
 	rotlist.push_back(rot30);
-	node->SetRotation(rotlist);
+	//node->SetRotation(rotlist);
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
@@ -126,6 +130,8 @@ int main(int argc, char* argv[])
 		//glUniformMatrix4fv(modelAttr,1, GL_FALSE, glm::value_ptr(cube->GetModelTransform()));
 		//cube->Render();
 
+		//iksolve->IKUpdate();
+		//node->SetRotation(iksolve->GetUpdatedAngles());
 		node->Render();
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
