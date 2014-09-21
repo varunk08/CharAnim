@@ -11,6 +11,7 @@ Node::Node(glm::vec3 position)
 	mRotationMat = glm::mat4(1.0f);
 	mTranslate = false;
 	this->mLength = glm::length(NODE_LENGTH);
+	mEndPos = glm::vec3 (NODE_LENGTH);
 }
 void Node::CreateNewChildNode()
 {
@@ -18,11 +19,6 @@ void Node::CreateNewChildNode()
 	Node* child = new Node(glm::vec3(0.0f, 0.0f, 0.0f));
 	child->SetAngle(0.0f);
 	child->SetTranslate(true);
-	//translate it to be at top end of parent node and then multiply with parent's model transform
-	child->ChainModelTransform(
-								this->mModelTransform *
-								glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,1.0f,0.0f))
-							);
 	this->mChild = child;
 
 }
@@ -43,16 +39,7 @@ void Node::SetShader(GLint shaderID)
 	}
 }
 
-void Node::ChainModelTransform(glm::mat4 transform)
-{
-	this->mPosition = glm::vec3(transform * glm::vec4(this->mPosition, 1.0f));
-	this->mModelTransform = transform;
-	this->mDrawable->SetModelTransform(transform);
-	if(mChild)
-	{
-		mChild->ChainModelTransform(this->mModelTransform * mChild->mModelTransform);
-	}
-}
+
 void Node::Render()
 {
 	mDrawable->Render();
@@ -60,15 +47,19 @@ void Node::Render()
 		mChild->Render();
 	}
 }
-void Node::SetRotation(std::list<glm::mat4> rotList)
+
+/*angles not used right now*/
+void Node::SetRotation(glm::mat4 parentTrans, std::list<glm::mat4> rotList, std::list<float> angles)
 {
 	//list has rotation pushed in this order: node n (end), node n-1,.., node 1.
 	//pop the list for self then send the remanining to child
 	//push_back list, pop_back list
 	glm::mat4 newRotTrans;
+	float angle = angles.back();
+	angles.pop_back();
 	if( !rotList.empty() )
 	{
-		std::cout << "Rot list pop " << rotList.size() << std::endl;
+		std::cout << "Angle: " << angle  << std::endl;
 		newRotTrans = rotList.back();
 		rotList.pop_back();
 	}
@@ -77,17 +68,20 @@ void Node::SetRotation(std::list<glm::mat4> rotList)
 	glm::mat4 newModelTransform;
 	if(mTranslate)
 	{
-		std::cout<< "Child: " <<mTranslate<<std::endl;
+		//std::cout<< "Child: "<<std::endl;
 		newModelTransform = glm::translate(glm::mat4(1.0f), NODE_LENGTH);
 	}
-	newModelTransform = newModelTransform * newRotTrans;
-	mModelTransform = newModelTransform; //update self model transform to new rot matrix
+	mModelTransform = parentTrans *  newModelTransform * newRotTrans; //update self model transform to new rot matrix
+	mDrawable->SetModelTransform(mModelTransform);
+	this->mPosition = glm::vec3(mModelTransform  * glm::vec4(this->mPosition, 1.0f));
+	this->mEndPos = glm::vec3(mModelTransform  * glm::vec4(this->mEndPos, 1.0f));
+	std::cout << mTranslate << " \nPos after Chain transform: " << glm::to_string(mPosition)
+		<< "\nEnd pos: " << glm::to_string(mEndPos) << std::endl;
 	if(mChild)
 	{
-		mChild->SetRotation(rotList); //refresh all children to have the updated rot matrix
+		mChild->SetRotation(mModelTransform, rotList, angles); //refresh all children to have the updated rot matrix
+		
 	}
-
-	ChainModelTransform(mModelTransform); // transform all children hierarchically
 
 }
 glm::vec3 Node::GetWorldPosition()

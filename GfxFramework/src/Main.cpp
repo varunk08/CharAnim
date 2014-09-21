@@ -12,7 +12,7 @@
 #include "Camera.h"
 #include "IKSolver.h"
 
-#define NUM_LINKS 2
+#define NUM_LINKS 3
 #define EIGEN_DONT_ALIGN_STATICALLY 1
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT 1
 using namespace Eigen;
@@ -20,6 +20,11 @@ using namespace std;
 
 double mCursorX, mCursorY;
 Camera *cam;
+Plane* plane;
+Node* node;
+Cube* cube;
+GLuint shaderProg;
+IKSolver* iksolve;
 void MouseScrollCallback(GLFWwindow* window, double xoff, double yoff)
 {
 	cam->UpdateViewDistance((float)yoff);
@@ -45,9 +50,48 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 		glfwSetCursorPosCallback(window, NULL);
 	}
 }
+void InitScene()
+{
+	//Objects
+	plane = new Plane(glm::vec3(0.0, 0.0, 0.0));
+	cube = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
+
+	node = new Node(glm::vec3(0.0f, 0.0f, 0.0f));
+	
+	node->CreateNewChildNode();
+	node->mChild->CreateNewChildNode();
+	node->SetAngle(0.0f);
+	node->SetShader(shaderProg);
+
+	cube->SetShader(shaderProg);
+	plane->SetShader(shaderProg);
+	std::list<glm::mat4> rotlist;
+	glm::mat4 rot0 = glm::rotate(glm::mat4(1.0f), 90.0f, glm::vec3(0.0, 0.0, 1.0f));
+	glm::mat4 rot1 = glm::rotate(glm::mat4(1.0f), -90.0f, glm::vec3(0.0, 0.0, 1.0f));
+	glm::mat4 rot2 = glm::rotate(glm::mat4(1.0f), 90.0f, glm::vec3(0.0, 0.0, 1.0f));
+	rotlist.push_back(rot0);//child 2
+	rotlist.push_back(rot1);//child 1
+	rotlist.push_back(rot2);//parent
+
+	std::list<float> rotAngles;
+	rotAngles.push_back(0);
+	rotAngles.push_back(-90.0f);
+	rotAngles.push_back(90.0f);
+	node->SetRotation(glm::mat4(1.0f), rotlist, rotAngles);
+
+	iksolve = new IKSolver(node, NUM_LINKS);
+	iksolve->SetTargetPosition(Vector3f(2, 2, 0));
+
+	//Transforms
+	plane->SetModelTransform(
+		//glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,-0.5f,-5.0f)) *
+		glm::rotate(glm::mat4(1.0f), -90.0f, glm::vec3(1.0f, 0.0f, 0.0f))
+		* glm::scale(glm::mat4(1.0f), glm::vec3(5.0f))
+		);
+
+}
 int main(int argc, char* argv[])
 {
-	
 	
 	 GLFWwindow* window;
     /* Initialize the library */
@@ -77,43 +121,15 @@ int main(int argc, char* argv[])
 	//Shaders
 	GLuint vs = ShaderUtils::CreateShaderFromFile("../src/shaders/simple.vert",GL_VERTEX_SHADER);
 	GLuint fs = ShaderUtils::CreateShaderFromFile("../src/shaders/simple.frag", GL_FRAGMENT_SHADER);
-	GLuint shaderProg = ShaderUtils::CreateProgramFromShaders(vs,fs);
+	 shaderProg = ShaderUtils::CreateProgramFromShaders(vs,fs);
 	GLint projAttr = glGetUniformLocation(shaderProg, "projection");
 	GLint modelAttr = glGetUniformLocation(shaderProg, "model");
 	GLint viewAttr = glGetUniformLocation(shaderProg, "view");
-
-	//Objects
-	Plane *plane = new Plane(glm::vec3(0.0,0.0,0.0));
-	Cube *cube = new Cube(glm::vec3(0.0f,0.0f, 0.0f));
-	Node *node = new Node(glm::vec3(0.0f,0.0f,0.0f));
-	node->CreateNewChildNode();
-	node->SetAngle(0.0f);
-	node->SetShader(shaderProg);
-	cube->SetShader(shaderProg);
-	plane->SetShader(shaderProg);
-	
-	IKSolver* iksolve = new IKSolver(node, NUM_LINKS);
-	iksolve->SetTargetPosition(Vector3f(1,1,1));
+	InitScene();
 	//GL state
-	glClearColor(0.5f,0.5f,0.5f,1.0f);
+	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
-	
-	//Transforms
-	plane->SetModelTransform(
-		//glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,-0.5f,-5.0f)) *
-		 glm::rotate(glm::mat4(1.0f),-90.0f,glm::vec3(1.0f,0.0f,0.0f))
-		 * glm::scale(glm::mat4(1.0f),glm::vec3(5.0f))
-	);
-/*	node->ChainModelTransform(
-		glm::translate(glm::mat4(1.0f),glm::vec3(1.0f,0.0f,0.0f))
-		* glm::rotate(glm::mat4(1.0f), 40.0f, glm::vec3(0.0f, 0.0f, 1.0f))
-		);*/
-	std::list<glm::mat4> rotlist;
-	glm::mat4 rot30(1.0f);
-	rot30 = glm::rotate(rot30,-30.0f,glm::vec3(0.0,0.0,1.0f));
-	rotlist.push_back(rot30);
-	rotlist.push_back(rot30);
-	//node->SetRotation(rotlist);
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
