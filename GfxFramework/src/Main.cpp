@@ -25,6 +25,7 @@ Node* node;
 Cube* cube;
 GLuint shaderProg;
 IKSolver* iksolve;
+glm::vec3 target(2, 2, 0);
 void MouseScrollCallback(GLFWwindow* window, double xoff, double yoff)
 {
 	cam->UpdateViewDistance((float)yoff);
@@ -66,7 +67,7 @@ void InitScene()
 	cube->SetShader(shaderProg);
 	plane->SetShader(shaderProg);
 	std::list<glm::mat4> rotlist;
-	glm::mat4 rot0 = glm::rotate(glm::mat4(1.0f), 90.0f, glm::vec3(0.0, 0.0, 1.0f));
+	glm::mat4 rot0 = glm::rotate(glm::mat4(1.0f), -90.0f, glm::vec3(0.0, 0.0, 1.0f));
 	glm::mat4 rot1 = glm::rotate(glm::mat4(1.0f), -90.0f, glm::vec3(0.0, 0.0, 1.0f));
 	glm::mat4 rot2 = glm::rotate(glm::mat4(1.0f), 90.0f, glm::vec3(0.0, 0.0, 1.0f));
 	rotlist.push_back(rot0);//child 2
@@ -74,13 +75,13 @@ void InitScene()
 	rotlist.push_back(rot2);//parent
 
 	std::list<float> rotAngles;
-	rotAngles.push_back(0);
+	rotAngles.push_back(-90.0f);
 	rotAngles.push_back(-90.0f);
 	rotAngles.push_back(90.0f);
 	node->SetRotation(glm::mat4(1.0f), rotlist, rotAngles);
 
 	iksolve = new IKSolver(node, NUM_LINKS);
-	iksolve->SetTargetPosition(Vector3f(2, 2, 0));
+	iksolve->SetTargetPosition(Vector3f(glm::value_ptr(target)));
 
 	//Transforms
 	plane->SetModelTransform(
@@ -88,7 +89,10 @@ void InitScene()
 		glm::rotate(glm::mat4(1.0f), -90.0f, glm::vec3(1.0f, 0.0f, 0.0f))
 		* glm::scale(glm::mat4(1.0f), glm::vec3(5.0f))
 		);
-
+	cube->SetModelTransform(
+		glm::translate(glm::mat4(1.0f), target)*
+		glm::scale(glm::mat4(1.0f),glm::vec3(0.5f))
+		);
 }
 int main(int argc, char* argv[])
 {
@@ -143,10 +147,10 @@ int main(int argc, char* argv[])
 		plane->Render();
 		
 		//Cube
-		//glUniformMatrix4fv(modelAttr,1, GL_FALSE, glm::value_ptr(cube->GetModelTransform()));
-		//cube->Render();
-
-		//iksolve->IKUpdate();
+		glUniformMatrix4fv(modelAttr,1, GL_FALSE, glm::value_ptr(cube->GetModelTransform()));
+		cube->Render();
+		
+		iksolve->IKUpdate();
 		//node->SetRotation(iksolve->GetUpdatedAngles());
 		node->Render();
         /* Swap front and back buffers */

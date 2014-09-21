@@ -24,6 +24,9 @@ public:
 	Cube *mDrawable; //Drawable
     bool mTranslate;
 	glm::mat4 mRotationMat; //model space rotation matrix
+
+
+
 	glm::vec3 mEndPos;
 
 	//Methods

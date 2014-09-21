@@ -48,7 +48,7 @@ void Node::Render()
 	}
 }
 
-/*angles not used right now*/
+/*angles used to set the angle*/
 void Node::SetRotation(glm::mat4 parentTrans, std::list<glm::mat4> rotList, std::list<float> angles)
 {
 	//list has rotation pushed in this order: node n (end), node n-1,.., node 1.
@@ -56,6 +56,7 @@ void Node::SetRotation(glm::mat4 parentTrans, std::list<glm::mat4> rotList, std:
 	//push_back list, pop_back list
 	glm::mat4 newRotTrans;
 	float angle = angles.back();
+	this->mWAngle = angle;
 	angles.pop_back();
 	if( !rotList.empty() )
 	{
@@ -86,7 +87,7 @@ void Node::SetRotation(glm::mat4 parentTrans, std::list<glm::mat4> rotList, std:
 }
 glm::vec3 Node::GetWorldPosition()
 {
-	return glm::vec3(this->mModelTransform * glm::vec4(this->mPosition, 1.0f));
+	return this->mPosition;
 }
 void Node::SetAngle(float angle)
 {
