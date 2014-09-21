@@ -54,6 +54,8 @@ void Node::SetRotation(glm::mat4 parentTrans, std::list<glm::mat4> rotList, std:
 	//list has rotation pushed in this order: node n (end), node n-1,.., node 1.
 	//pop the list for self then send the remanining to child
 	//push_back list, pop_back list
+	this->mPosition = glm::vec3(0.0, 0.0, 0.0f);
+	this->mEndPos = glm::vec3(0.0, 1.0, 0.0);
 	glm::mat4 newRotTrans;
 	float angle = angles.back();
 	this->mWAngle = angle;
@@ -64,9 +66,10 @@ void Node::SetRotation(glm::mat4 parentTrans, std::list<glm::mat4> rotList, std:
 		newRotTrans = rotList.back();
 		rotList.pop_back();
 	}
+	else return;
 	this->mRotationMat = newRotTrans;
 	// construct new model transformation
-	glm::mat4 newModelTransform;
+	glm::mat4 newModelTransform(1.0f);
 	if(mTranslate)
 	{
 		//std::cout<< "Child: "<<std::endl;
@@ -77,7 +80,7 @@ void Node::SetRotation(glm::mat4 parentTrans, std::list<glm::mat4> rotList, std:
 	this->mPosition = glm::vec3(mModelTransform  * glm::vec4(this->mPosition, 1.0f));
 	this->mEndPos = glm::vec3(mModelTransform  * glm::vec4(this->mEndPos, 1.0f));
 	std::cout << mTranslate << " \nPos after Chain transform: " << glm::to_string(mPosition)
-		<< "\nEnd pos: " << glm::to_string(mEndPos) << std::endl;
+		<< " End pos: " << glm::to_string(mEndPos) << std::endl;
 	if(mChild)
 	{
 		mChild->SetRotation(mModelTransform, rotList, angles); //refresh all children to have the updated rot matrix

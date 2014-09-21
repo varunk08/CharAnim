@@ -25,7 +25,7 @@ Node* node;
 Cube* cube;
 GLuint shaderProg;
 IKSolver* iksolve;
-glm::vec3 target(2, 2, 0);
+glm::vec3 target(-2, 2, 0);
 void MouseScrollCallback(GLFWwindow* window, double xoff, double yoff)
 {
 	cam->UpdateViewDistance((float)yoff);
