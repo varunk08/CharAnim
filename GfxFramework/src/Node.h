@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <list>
+#include <vector>
 #include <Eigen\Dense>
 #include <glm/glm.hpp>
 #include <GL\glew.h>
@@ -17,7 +18,7 @@ class Node
 public:
 	//Properties
 	glm::vec3 mPosition; //position in object coordinates. position is same as joint position
-	float mWAngle;
+	std::vector<float> mWAngle;
 	float mLength;
 	Node* mChild;	
 	glm::mat4 mModelTransform;
@@ -36,12 +37,12 @@ public:
 	void UpdateChildTransform(glm::mat4 newRotation);
 	void SetChild(Node* childNode);
 	void CreateNewChildNode();
-	void SetRotation(glm::mat4 parentTrans, std::list<glm::mat4> rotList, std::list<float> angles); //must clear self transform and set new transform
+	void SetRotation(glm::mat4 parentTrans, std::list<glm::mat4> rotList, std::list<std::vector<float> > angles); //must clear self transform and set new transform
 	float* GetChildAngles();
 	void SetTranslate(bool isChild);
 	glm::vec3 GetWorldPosition();
-	void SetAngle(float angle);
-	float GetAngle();
+	void SetAngle(std::vector<float> angle);
+	std::vector<float> GetAngle();
 	
 	~Node();
 

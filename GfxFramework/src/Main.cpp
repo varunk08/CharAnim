@@ -51,6 +51,39 @@ void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 		glfwSetCursorPosCallback(window, NULL);
 	}
 }
+void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (action = GLFW_PRESS)
+	{
+	switch (key)
+	{
+	case GLFW_KEY_W:
+		target = glm::vec3(target.x, target.y + 0.1f, target.z);
+		break;
+	case GLFW_KEY_S:
+		target = glm::vec3(target.x, target.y - 0.1f, target.z);
+		break;
+	case GLFW_KEY_A:
+		target = glm::vec3(target.x - 0.1f, target.y, target.z);
+		break;
+	case GLFW_KEY_D:
+		target = glm::vec3(target.x + 0.1f, target.y, target.z);
+		break;
+	case GLFW_KEY_Q:
+		target = glm::vec3(target.x, target.y, target.z + 0.1f);
+		break;
+	case GLFW_KEY_E:
+		target = glm::vec3(target.x, target.y, target.z - 0.1f);
+		break;
+		}
+		iksolve->SetTargetPosition(Vector3f(glm::value_ptr(target)));
+		cube->SetModelTransform(
+			glm::translate(glm::mat4(1.0f), target)*
+			glm::scale(glm::mat4(1.0f), glm::vec3(0.5f,0.25f,0.5f))
+			);
+	}
+	
+}
 void InitScene()
 {
 	//Objects
@@ -61,23 +94,47 @@ void InitScene()
 	
 	node->CreateNewChildNode();
 	node->mChild->CreateNewChildNode();
-	node->SetAngle(0.0f);
+	//node->SetAngle(0.0f);
 	node->SetShader(shaderProg);
 
 	cube->SetShader(shaderProg);
 	plane->SetShader(shaderProg);
 	std::list<glm::mat4> rotlist;
-	glm::mat4 rot0 = glm::rotate(glm::mat4(1.0f), -90.0f, glm::vec3(0.0, 0.0, 1.0f));
-	glm::mat4 rot1 = glm::rotate(glm::mat4(1.0f), -90.0f, glm::vec3(0.0, 0.0, 1.0f));
-	glm::mat4 rot2 = glm::rotate(glm::mat4(1.0f), 90.0f, glm::vec3(0.0, 0.0, 1.0f));
-	rotlist.push_back(rot0);//child 2
-	rotlist.push_back(rot1);//child 1
-	rotlist.push_back(rot2);//parent
+	std::vector<float > vAxisRot0;
+	glm::mat4 rotnilxyz = glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(0.0f, 0.0f, 1.0f)) *
+		glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(0.0f, 1.0f, 0.0f)) *
+		glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+	
+	vAxisRot0.push_back(0.0f); //x
+	vAxisRot0.push_back(0.0f); //y
+	vAxisRot0.push_back(0.0f); //z
 
-	std::list<float> rotAngles;
-	rotAngles.push_back(-90.0f);
-	rotAngles.push_back(-90.0f);
-	rotAngles.push_back(90.0f);
+	glm::mat4 rot0z = glm::rotate(glm::mat4(1.0f), -90.0f, glm::vec3(0.0, 0.0, 1.0f));
+	glm::mat4 rot1z = glm::rotate(glm::mat4(1.0f), -90.0f, glm::vec3(0.0, 0.0, 1.0f));
+	glm::mat4 rot2z = glm::rotate(glm::mat4(1.0f), 90.0f, glm::vec3(0.0, 0.0, 1.0f));
+
+	rotlist.push_back(rot0z);//child 2
+	rotlist.push_back(rot1z);//child 1
+	rotlist.push_back(rot2z);//parent
+	
+	std::list<vector<float> > rotAngles;
+	std::vector<float> vRot0;
+	vRot0.push_back(0.0f);
+	vRot0.push_back(0.0f);
+	vRot0.push_back(-90.0f);
+	std::vector<float> vRot1;
+	vRot1.push_back(0.0f);
+	vRot1.push_back(0.0f);
+	vRot1.push_back(-90.0f);
+	std::vector<float> vRot2;
+	vRot2.push_back(0.0f);
+	vRot2.push_back(0.0f);
+	vRot2.push_back(90.0f);
+
+	rotAngles.push_back(vRot0);
+	rotAngles.push_back(vRot1);
+	rotAngles.push_back(vRot2);
+
 	node->SetRotation(glm::mat4(1.0f), rotlist, rotAngles);
 
 	iksolve = new IKSolver(node, NUM_LINKS);
@@ -91,7 +148,7 @@ void InitScene()
 		);
 	cube->SetModelTransform(
 		glm::translate(glm::mat4(1.0f), target)*
-		glm::scale(glm::mat4(1.0f),glm::vec3(0.5f))
+		glm::scale(glm::mat4(1.0f),glm::vec3(0.5f,0.25f,0.5f))
 		);
 }
 int main(int argc, char* argv[])
@@ -103,7 +160,7 @@ int main(int argc, char* argv[])
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(800, 600, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -119,6 +176,7 @@ int main(int argc, char* argv[])
 	 }
 	 glfwSetMouseButtonCallback(window, MouseButtonCallback);
 	 glfwSetScrollCallback(window, MouseScrollCallback);
+	 glfwSetKeyCallback(window, KeyCallback);
 	 cam = new Camera(glm::vec3(0.0, 1.0f, 2.0f),glm::vec3(0.0f,0.0f,0.0f));
 	 cam->SetPerspectiveProjection(45.0f, 4.0f/3.0f, 0.1f, 100.0f);
 	

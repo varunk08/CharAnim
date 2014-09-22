@@ -12,7 +12,7 @@ class IKSolver
 {
 public:
 	//Properties
-	std::list<float> mAngles;
+	std::list<std::vector<float> > mAngles;
 	std::list<Vector3f> mJointPositions;
 	Node* mIKArm;
 	int mNumLinks;
@@ -33,7 +33,10 @@ public:
 
 private:
 	void PopulateData();
-
+	std::vector<Vector3f> rotAxes;
+	Vector3f rotAxisX;
+	Vector3f rotAxisY;
+	Vector3f rotAxisZ;
 };
 
 IKSolver::IKSolver(Node* ikArm, int num)
@@ -41,6 +44,12 @@ IKSolver::IKSolver(Node* ikArm, int num)
 	this->mIKArm = ikArm;
 	this->mNumLinks = num;
 	this->SetTargetPosition(Vector3f(0,0,0));
+	rotAxisX = Vector3f(1, 0, 0);
+	rotAxisY = Vector3f(0, 1, 0);
+	rotAxisZ = Vector3f(0, 0, 1);
+	rotAxes.push_back(rotAxisX);
+	rotAxes.push_back(rotAxisY);
+	rotAxes.push_back(rotAxisZ);
 	PopulateData();
 }
 
@@ -48,16 +57,16 @@ void IKSolver::IKUpdate()
 {
 
 	Vector3f endEffPos = GetEndPos();
-	Vector3f rotAxis(0, 0, 1);
-	std::cout<<"End Effector pos: "<< endEffPos<<std::endl;
+	//Vector3f rotAxis(0, 0, 1);
+	//std::cout<<"End Effector pos: "<< endEffPos<<std::endl;
 	
 	//Find current EndEffectorPos
 	
 		//Vector3f endEffPos = GetEndPos();
 		Vector3f E = mTargetPosition - endEffPos;
-		std::cout<<"E norm: "<<E.norm()<<std::endl;
+		//std::cout<<"E norm: "<<E.norm()<<std::endl;
 		if(E.norm() <= 0.1f) return;
-		MatrixXf jacobian(E.rows(), mNumLinks);
+		MatrixXf jacobian(E.rows(), 3 * mNumLinks);
 		jacobian.setZero();
 		//compute jacobian
 		/*For each joint get the populated data*/
@@ -65,11 +74,14 @@ void IKSolver::IKUpdate()
 		{
 			Vector3f jointPos = mJointPositions.back(); //child child parent
 			mJointPositions.pop_back();
-			Vector3f diff = jointPos - endEffPos ;
-			Vector3f elem = diff.cross(rotAxis);
-			for(int row=0;row<3;row++)
+			Vector3f diff = jointPos - endEffPos;
+			for (int axes = 0; axes < 3; axes++)
 			{
-				jacobian(row, i) = elem.coeff(row);// + 0.000001f;
+				Vector3f elem = diff.cross(rotAxes[axes]);
+				for (int row = 0; row < 3; row++)
+				{
+					jacobian(row, (3 *i) + axes) = elem.coeff(row);// + 0.000001f;
+				}
 			}
 			
 			
@@ -85,16 +97,21 @@ void IKSolver::IKUpdate()
 		//update angles
 		//create rotation matrices and angles and update node transforms
 		std::list<glm::mat4> rotMatList;
-		std::list<float> angleList;
-		unsigned int j=mNumLinks-1;
+		std::list<std::vector<float> > angleList;
+		unsigned int j= (3 * mNumLinks) -1;
 		/*mAngles is Parent last (the correct order). dTheta is child last*/
-		for (std::list<float>::iterator it=mAngles.begin(); it != mAngles.end(); ++it)
+		for (std::list<std::vector<float> >::iterator it=mAngles.begin(); it != mAngles.end(); ++it)
 		//for(int j=0; j<mNumLinks;++j)
 		{
-			*it +=  dTheta[j]*10.0f;
-			std::cout<<"j: "<<j<<"  "<<dTheta[j]<<std::endl;
+			it->at(2) +=  dTheta[j] * 5.0f;
+			it->at(1) += dTheta[--j] * 5.0f;
+			it->at(0) += dTheta[--j] * 5.0f;
+			
+			//std::cout<<"j: "<<j<<"  "<<dTheta[j]<<std::endl;
 			//if( mAngles[j] > 360.0f) mAngles[j] /= 360.0f;
-			rotMatList.push_back(glm::rotate(glm::mat4(1.0f),*it,glm::vec3(0.0,0.0,1.0)));
+			rotMatList.push_back(glm::rotate(glm::mat4(1.0f),it->at(2),glm::vec3(0.0,0.0,1.0))
+				* glm::rotate(glm::mat4(1.0f), it->at(1), glm::vec3(0.0, 1.0, 0.0))
+				*glm::rotate(glm::mat4(1.0f), it->at(0), glm::vec3(1.0, 0.0, 0.0)));
 			angleList.push_back(*it);
 			j--;
 			

@@ -17,7 +17,8 @@ void Node::CreateNewChildNode()
 {
 	//create a new node
 	Node* child = new Node(glm::vec3(0.0f, 0.0f, 0.0f));
-	child->SetAngle(0.0f);
+	std::vector<float> angles; angles.push_back(0.0f); angles.push_back(0.0f); angles.push_back(0.0f);
+	child->SetAngle(angles);
 	child->SetTranslate(true);
 	this->mChild = child;
 
@@ -49,7 +50,7 @@ void Node::Render()
 }
 
 /*angles used to set the angle*/
-void Node::SetRotation(glm::mat4 parentTrans, std::list<glm::mat4> rotList, std::list<float> angles)
+void Node::SetRotation(glm::mat4 parentTrans, std::list<glm::mat4> rotList, std::list<std::vector<float> > angles)
 {
 	//list has rotation pushed in this order: node n (end), node n-1,.., node 1.
 	//pop the list for self then send the remanining to child
@@ -57,12 +58,12 @@ void Node::SetRotation(glm::mat4 parentTrans, std::list<glm::mat4> rotList, std:
 	this->mPosition = glm::vec3(0.0, 0.0, 0.0f);
 	this->mEndPos = glm::vec3(0.0, 1.0, 0.0);
 	glm::mat4 newRotTrans;
-	float angle = angles.back();
+	std::vector<float> angle = angles.back();
 	this->mWAngle = angle;
 	angles.pop_back();
 	if( !rotList.empty() )
 	{
-		std::cout << "Angle: " << angle  << std::endl;
+		//std::cout << "Angle: " << angle  << std::endl;
 		newRotTrans = rotList.back();
 		rotList.pop_back();
 	}
@@ -92,11 +93,11 @@ glm::vec3 Node::GetWorldPosition()
 {
 	return this->mPosition;
 }
-void Node::SetAngle(float angle)
+void Node::SetAngle(std::vector<float> angle)
 {
 	this->mWAngle = angle;
 }
-float Node::GetAngle()
+std::vector<float> Node::GetAngle()
 {
 	return this->mWAngle;
 }
