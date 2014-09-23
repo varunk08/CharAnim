@@ -33,9 +33,11 @@ public:
 private:
 	GLuint mIndexBuf;
 	GLuint mColBuf;
+	GLuint mNormalBuf;
 	GLuint mColAttr;
 	GLuint mPositionAttr;
 	GLuint mColorAttr;
+	GLuint mNormalAttr;
 	GLuint mTexCoordAttr;
 	GLuint mModelTransAttr;
 };

@@ -2,10 +2,14 @@
 
 in vec3 position;
 in vec3 color;
+in vec3 normal;
 
 uniform mat4 projection;
 uniform mat4 model;
 uniform mat4 view;
+
+uniform vec3 lightdir;
+uniform vec4 ambient;
 
 out vec3 fragColor;
 

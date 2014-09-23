@@ -11,6 +11,7 @@
 #include "Cube.h"
 #include "Camera.h"
 #include "IKSolver.h"
+#include "Light.h"
 
 #define NUM_LINKS 3
 #define EIGEN_DONT_ALIGN_STATICALLY 1
@@ -26,6 +27,7 @@ Cube* cube;
 GLuint shaderProg;
 IKSolver* iksolve;
 glm::vec3 target(-2, 2, 0);
+Light* light;
 void MouseScrollCallback(GLFWwindow* window, double xoff, double yoff)
 {
 	cam->UpdateViewDistance((float)yoff);
@@ -86,6 +88,9 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 }
 void InitScene()
 {
+	//light
+	light = new Light(glm::vec3(0.0, 10.0, 0.0), glm::vec3(0.0f, -1.0f, 0.0f));
+
 	//Objects
 	plane = new Plane(glm::vec3(0.0, 0.0, 0.0));
 	cube = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -187,6 +192,7 @@ int main(int argc, char* argv[])
 	GLint projAttr = glGetUniformLocation(shaderProg, "projection");
 	GLint modelAttr = glGetUniformLocation(shaderProg, "model");
 	GLint viewAttr = glGetUniformLocation(shaderProg, "view");
+	//GLint lightPosAttr = glGetUniformLocation(shaderProg, "view");
 	InitScene();
 	//GL state
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);

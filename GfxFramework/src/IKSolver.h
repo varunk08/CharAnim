@@ -86,7 +86,7 @@ void IKSolver::IKUpdate()
 			
 			
 		}
-		std::cout << jacobian << std::endl;
+		//std::cout << jacobian << std::endl;
 		Eigen::JacobiSVD<MatrixXf> svd (jacobian,ComputeThinU|ComputeThinV);
 		
 		VectorXf dTheta = svd.solve(E);
@@ -103,9 +103,9 @@ void IKSolver::IKUpdate()
 		for (std::list<std::vector<float> >::iterator it=mAngles.begin(); it != mAngles.end(); ++it)
 		//for(int j=0; j<mNumLinks;++j)
 		{
-			it->at(2) +=  dTheta[j] * 5.0f;
-			it->at(1) += dTheta[--j] * 5.0f;
-			it->at(0) += dTheta[--j] * 5.0f;
+			it->at(2) +=  dTheta[j] * 10.0f;
+			it->at(1) += dTheta[--j] * 10.0f;
+			it->at(0) += dTheta[--j] * 10.0f;
 			
 			//std::cout<<"j: "<<j<<"  "<<dTheta[j]<<std::endl;
 			//if( mAngles[j] > 360.0f) mAngles[j] /= 360.0f;
