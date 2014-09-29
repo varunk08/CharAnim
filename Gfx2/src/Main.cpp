@@ -24,6 +24,7 @@ Cube* cube;
 GLuint shaderProg;
 glm::vec3 target(0, 0, 0);
 Light* light;
+
 void MouseScrollCallback(GLFWwindow* window, double xoff, double yoff)
 {
 	cam->UpdateViewDistance((float)yoff);
@@ -140,8 +141,9 @@ int main(int argc, char* argv[])
 	GLint projAttr = glGetUniformLocation(shaderProg, "projection");
 	GLint modelAttr = glGetUniformLocation(shaderProg, "model");
 	GLint viewAttr = glGetUniformLocation(shaderProg, "view");
-	//GLint lightPosAttr = glGetUniformLocation(shaderProg, "view");
+
 	InitScene();
+
 	//GL state
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 	glEnable(GL_DEPTH_TEST);

@@ -2,8 +2,8 @@
 
 in vec3 position;
 in vec3 color;
-in vec3 normal;
 
+uniform mat3 normalmatrix; //normal matrix
 uniform mat4 projection;
 uniform mat4 model;
 uniform mat4 view;
