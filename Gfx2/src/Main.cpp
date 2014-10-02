@@ -77,16 +77,18 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		}
 		cube->SetModelTransform(
 			glm::translate(glm::mat4(1.0f), target)*
-			glm::scale(glm::mat4(1.0f), glm::vec3(0.5f,0.25f,0.5f))
+			glm::scale(glm::mat4(1.0f), glm::vec3(0.5f,0.5f,0.5f))
 			);
+			
+	light->mWorldPosition = target;
 	}
 	
 }
 void InitScene()
 {
 	//light
-	light = new Light(glm::vec3(0.0, 10.0, 0.0), glm::vec3(0.0f, -1.0f, 0.0f));
-
+	light = new Light(glm::vec3(10.0, 10.0, 0.0));
+	light->SetShader(shaderProg);
 	//Objects
 	plane = new Plane(glm::vec3(0.0, 0.0, 0.0));
 	cube = new Cube(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -141,7 +143,7 @@ int main(int argc, char* argv[])
 	GLint projAttr = glGetUniformLocation(shaderProg, "projection");
 	GLint modelAttr = glGetUniformLocation(shaderProg, "model");
 	GLint viewAttr = glGetUniformLocation(shaderProg, "view");
-
+	GLint camposAttr = glGetUniformLocation(shaderProg, "viewpos");
 	InitScene();
 
 	//GL state
@@ -156,13 +158,20 @@ int main(int argc, char* argv[])
 		glUseProgram(shaderProg);
 		glUniformMatrix4fv(projAttr,1,GL_FALSE,glm::value_ptr(cam->GetProjectionMatrix()));
 		glUniformMatrix4fv(viewAttr, 1, GL_FALSE, glm::value_ptr(cam->GetViewTransform()));
+
+		//update cam view pos
+		glUniform3fv(camposAttr,1 , glm::value_ptr(cam->mWorldPosition));
+
+		//light update
+		light->Update();
+
 		//Plane
 		glUniformMatrix4fv(modelAttr,1,GL_FALSE,glm::value_ptr(plane->GetModelTransform()));
 		plane->Render();
 		
 		//Cube
-		glUniformMatrix4fv(modelAttr,1, GL_FALSE, glm::value_ptr(cube->GetModelTransform()));
-		cube->Render();
+		//glUniformMatrix4fv(modelAttr,1, GL_FALSE, glm::value_ptr(cube->GetModelTransform()));
+		cube->Render(cam->GetViewTransform());
 		
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

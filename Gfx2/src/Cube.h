@@ -20,11 +20,14 @@ public:
 	GLuint mVertexBuf;
 	GLuint mVAO;
 	glm::mat4 mModelTransform;
+	glm::mat3 mNormalMatrix;
+	float ka, kd, ks;
 
+	//Methods
 	Cube(glm::vec3 pos);
 	void SetGeometry();
 	void InitBuffers();
-	void Render();
+	void Render(glm::mat4 viewMatrix);
 	void SetShader(GLuint shaderID);
 	void SetModelTransform(glm::mat4 transform);
 	glm::mat4 GetModelTransform();
@@ -40,6 +43,8 @@ private:
 	GLuint mNormalAttr;
 	GLuint mTexCoordAttr;
 	GLuint mModelTransAttr;
+	GLuint mNormalMatrixAttr;
+	GLuint kaloc, ksloc, kdloc;
 };
 
 

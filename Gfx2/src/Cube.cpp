@@ -3,15 +3,25 @@
 Cube::Cube(glm::vec3 pos)
 {
 	this->mPosition = pos;
-	
+	this->kd = 0.5;
 }
 void Cube::SetShader(GLuint shaderID)
 {
 	glUseProgram(shaderID);
+	//attributes
 	mPositionAttr = glGetAttribLocation(shaderID, "position");
 	mColAttr = glGetAttribLocation(shaderID, "color");
 	mNormalAttr = glGetAttribLocation(shaderID, "normal");
+
+	//model transform matrices
 	mModelTransAttr = glGetUniformLocation(shaderID, "model");
+	mNormalMatrixAttr = glGetUniformLocation(shaderID, "normalmatrix");
+
+	//material properties
+	kaloc = glGetUniformLocation(shaderID, "ka");
+	kdloc = glGetUniformLocation(shaderID, "kd");
+	ksloc = glGetUniformLocation(shaderID, "ks");
+
 	this->SetModelTransform(glm::mat4(1.0f));
 	this->InitBuffers();
 	glUseProgram(0);
@@ -60,14 +70,14 @@ void Cube::InitBuffers()
 
 	};
 	GLfloat colorData[] = {
-		0.0f,  1.0f, 0.0f,
-		0.0f,  1.0f, 0.0f,
-		0.0f,  0.0f, 1.0f,
-		0.0f,  0.0f, 1.0f,
-		0.0f,  1.0f, 0.0f,
-		0.0f,  1.0f, 0.0f,
-		0.0f,  0.0f, 1.0f,
-		0.0f,  0.0f, 1.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f
 	};
 
 	GLfloat faceNormalData[] = {
@@ -103,10 +113,25 @@ void Cube::InitBuffers()
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, NULL);
 }
-void Cube::Render()
+void Cube::Render(glm::mat4 viewMatrix)
 {
+
+	//update normal matrix
+	mNormalMatrix = glm::mat3(glm::transpose(glm::inverse(mModelTransform)));
+	glUniformMatrix3fv(	mNormalMatrixAttr, 1, GL_FALSE, glm::value_ptr(mNormalMatrix));
+
+	//model matrix
 	glUniformMatrix4fv(mModelTransAttr,1, GL_FALSE, glm::value_ptr(mModelTransform));
+
+	//vao with pos, color, normal
 	glBindVertexArray(mVAO);
+
+	//material properties
+	glUniform1f(kaloc, this->ka);
+	glUniform1f(kdloc, this->kd);
+	glUniform1f(ksloc, this->ks);
+
+	//indexed draw
 	glDrawElements(GL_TRIANGLES, 12 * 3, GL_UNSIGNED_INT, NULL);
 	
 }
