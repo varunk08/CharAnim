@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <list>
+#include "time.h"
 #include "Plane.h"
 #include "ShaderUtils.h"
 #include "Cube.h"
@@ -86,6 +87,8 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 }
 void InitScene()
 {
+
+	srand(time(NULL));
 	//light
 	light = new Light(glm::vec3(10.0, 10.0, 0.0));
 	light->SetShader(shaderProg);
@@ -95,13 +98,14 @@ void InitScene()
 	cube->SetShader(shaderProg);
 	plane->SetShader(shaderProg);
 	
-
+	sphere = new Sphere(4);
+	sphere->SetShader(shaderProg);
 
 	//Transforms
 	plane->SetModelTransform(
 		//glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,-0.5f,-5.0f)) *
-		glm::rotate(glm::mat4(1.0f), -90.0f, glm::vec3(1.0f, 0.0f, 0.0f))
-		* glm::scale(glm::mat4(1.0f), glm::vec3(5.0f))
+		//glm::rotate(glm::mat4(1.0f), -90.0f, glm::vec3(1.0f, 0.0f, 0.0f)) *
+		 glm::scale(glm::mat4(1.0f), glm::vec3(5.0f))
 		);
 	cube->SetModelTransform(
 		glm::translate(glm::mat4(1.0f), target)*
@@ -170,6 +174,7 @@ int main(int argc, char* argv[])
 		glUniformMatrix4fv(modelAttr,1,GL_FALSE,glm::value_ptr(plane->GetModelTransform()));
 		plane->Render();
 		
+		sphere->Render(cam->GetViewTransform());
 		//Cube
 		//glUniformMatrix4fv(modelAttr,1, GL_FALSE, glm::value_ptr(cube->GetModelTransform()));
 		cube->Render(cam->GetViewTransform());

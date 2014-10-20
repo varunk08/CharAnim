@@ -12,8 +12,11 @@
 class Sphere
 {
 public:
+	glm::mat4 mModelTransform;
+	glm::mat3 mNormalMatrix;
 	Sphere(int sub);
 	~Sphere();
+	void Render(glm::mat4 viewMatrix);
 	void SetShader(GLuint shaderID);
 	void SetModelTransform(glm::mat4 modelTrans);
 	void InitBuffers();
@@ -29,8 +32,11 @@ private:
 	GLuint	mNormalAttr;
 	GLuint mModelTransAttr;
 	GLuint mNormalMatrixAttr;
+	GLuint mVAO;
+	GLuint mVertexBuf;
+	GLuint mColBuf;
+	GLuint mNormalBuf;
 
-	
 	void sphTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c);
 	void CreateIcosahedron();
 	void refineIcoSphere(int subdivide);
@@ -65,6 +71,76 @@ void Sphere::SetShader(GLuint shaderID)
 	this->SetModelTransform(glm::mat4(1.0f));
 	this->InitBuffers();
 	glUseProgram(0);
+}
+void Sphere::SetModelTransform(glm::mat4 trans)
+{
+	this->mModelTransform = trans;
+}
+void Sphere::InitBuffers()
+{
+	glGenVertexArrays(1, &mVAO);
+	glBindVertexArray(mVAO);
+	glGenBuffers(1, &mVertexBuf);
+	glGenBuffers(1, &mColBuf);
+	glGenBuffers(1, &mNormalBuf);
+
+	std::vector<GLfloat> sphereVertexData;
+	std::vector<GLfloat> sphereColorData;
+	std::vector<GLfloat> sphereNormalData;
+	for (int i = 0; i < sphereVertices.size(); i++)
+	{
+		sphereVertexData.push_back(sphereVertices[i].x);
+		sphereVertexData.push_back(sphereVertices[i].y);
+		sphereVertexData.push_back(sphereVertices[i].z);
+
+		sphereColorData.push_back(sphereColors[i].x);
+		sphereColorData.push_back(sphereColors[i].y);
+		sphereColorData.push_back(sphereColors[i].z);
+
+		sphereNormalData.push_back(sphereNormals[i].x);
+		sphereNormalData.push_back(sphereNormals[i].y);
+		sphereNormalData.push_back(sphereNormals[i].z);
+
+
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVertexBuf);
+	glBufferData(GL_ARRAY_BUFFER, sphereVertexData.size() * sizeof(GLfloat), &sphereVertexData[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(mPositionAttr);
+	glVertexAttribPointer(mPositionAttr, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, mColBuf);
+	glBufferData(GL_ARRAY_BUFFER, sphereColorData.size() * sizeof(GLfloat), &sphereColorData[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(mColAttr);
+	glVertexAttribPointer(mColAttr, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, mNormalBuf);
+	glBufferData(GL_ARRAY_BUFFER, sphereNormalData.size() * sizeof(GLfloat), &sphereNormalData[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(mNormalAttr);
+	glVertexAttribPointer(mNormalAttr, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, NULL);
+	
+}
+void Sphere::Render(glm::mat4 viewMatrix)
+{
+
+	//update normal matrix
+	mNormalMatrix = glm::mat3(glm::transpose(glm::inverse(mModelTransform)));
+	glUniformMatrix3fv(mNormalMatrixAttr, 1, GL_FALSE, glm::value_ptr(mNormalMatrix));
+
+	//model matrix
+	glUniformMatrix4fv(mModelTransAttr, 1, GL_FALSE, glm::value_ptr(mModelTransform));
+
+	//vao with pos, color, normal
+	glBindVertexArray(mVAO);
+
+	//material properties
+	/*glUniform1f(kaloc, this->ka);
+	glUniform1f(kdloc, this->kd);
+	glUniform1f(ksloc, this->ks);*/
+
+	
+	glDrawArrays(GL_TRIANGLES, 0, sphereVertices.size() * 3);
+
 }
 void Sphere::refineIcoSphere(int subdivide)
 {
@@ -121,7 +197,8 @@ void Sphere::divideTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c, unsigned int 
 void Sphere::sphTriangle(glm::vec3 a, glm::vec3 b, glm::vec3 c)
 {
 	//right now sphere vertices dont have indices - indices to be generated later
-	glm::vec3 col(rand(), rand(), rand());
+	//glm::vec3 col((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
+	glm::vec3 col(0.8f, 0.4f, 0.2f);
 	//vertices
 	sphereVertices.push_back(a);
 	sphereVertices.push_back(b);
