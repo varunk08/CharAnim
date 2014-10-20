@@ -31,7 +31,7 @@ void main(void)
 
 	//lighting
 	vec3 pos = -(view * model * vec4(position, 1.0f)).xyz;
-	vec3 lpos = (view * model * vec4(lightpos, 1.0f)).xyz;
+	vec3 lpos = (view  * vec4(lightpos, 1.0f)).xyz;
 	vec3 N = normalize((view * model * vec4(normal, 1.0f)).xyz);
 	vec3 L = normalize(lpos - pos);
 	vec3 E = normalize( pos);

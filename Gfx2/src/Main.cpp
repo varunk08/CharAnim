@@ -10,7 +10,7 @@
 #include "Cube.h"
 #include "Camera.h"
 #include "Light.h"
-
+#include "Sphere.h"
 #define NUM_LINKS 3
 #define EIGEN_DONT_ALIGN_STATICALLY 1
 #define EIGEN_DISABLE_UNALIGNED_ARRAY_ASSERT 1
@@ -24,7 +24,7 @@ Cube* cube;
 GLuint shaderProg;
 glm::vec3 target(0, 0, 0);
 Light* light;
-
+Sphere* sphere;
 void MouseScrollCallback(GLFWwindow* window, double xoff, double yoff)
 {
 	cam->UpdateViewDistance((float)yoff);
@@ -95,6 +95,7 @@ void InitScene()
 	cube->SetShader(shaderProg);
 	plane->SetShader(shaderProg);
 	
+
 
 	//Transforms
 	plane->SetModelTransform(

@@ -96,6 +96,7 @@
     <ClInclude Include="..\src\Light.h" />
     <ClInclude Include="..\src\Plane.h" />
     <ClInclude Include="..\src\ShaderUtils.h" />
+    <ClInclude Include="..\src\Sphere.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\shaders\simple.frag" />
